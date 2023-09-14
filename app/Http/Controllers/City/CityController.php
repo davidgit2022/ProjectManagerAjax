@@ -9,7 +9,8 @@ use Illuminate\Validation\Rule;
 
 class CityController extends Controller
 {
-    public $pageName = 'Listado', $componentName = 'Ciudades';
+    public $pageName = 'LISTADO', $componentName = 'CIUDADES';
+
     public function index()
     {
         if (request()->ajax()) {
@@ -41,12 +42,6 @@ class CityController extends Controller
             ]
         );
 
-        return Response()->json($city);
-    }
-
-
-    public function show(City $city)
-    {
         return response()->json($city);
     }
     
@@ -57,7 +52,7 @@ class CityController extends Controller
         return response()->json($city);
     }
 
-    public function update(Request $request,$id)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required|unique:cities,name,' . $request->id,
@@ -65,8 +60,7 @@ class CityController extends Controller
             'name.required' => 'El campo es obligatorio',
             'name.unique' => 'El nombre debe ser unico',
         ]);
-        $city = City::find($id);
-        $city->update([
+        $city = City::find($request->id)->update([
             'name' => $request->name
         ]);
 

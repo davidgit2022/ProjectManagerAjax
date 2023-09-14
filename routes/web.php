@@ -18,15 +18,16 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 
 Route::controller(CityController::class)->group(function () {
+    
     Route::get('/cities','index')->name('cities.index');
 
     Route::post('/cities','store')->name('cities.store');
 
-    Route::get('/cities/{id}/edit',  'edit')->name('cities.edit');
+    Route::get('/cities/edit/{id}',  'edit')->name('cities.edit');
 
-    Route::put('cities/{id}','update')->name('cities.update');
+    Route::post('/cities/update/{id}','update')->name('cities.update');
 
-    Route::delete('cities/{id}','destroy')->name('cities.destroy');
+    Route::delete('/cities/delete/{id}','destroy')->name('cities.destroy');
 });
 
 Route::controller(CompanyController::class)->group(function(){
