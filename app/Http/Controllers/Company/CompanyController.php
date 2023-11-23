@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
-    public $pageName = 'Listado', $componentName = 'Compañias';
+    public $pageName = 'LISTADO', $componentName = 'COMPAÑIAS';
+
     public function index()
     {
         if (request()->ajax()) {
@@ -42,19 +43,13 @@ class CompanyController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Company $company)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Company $company)
+    public function edit($id)
     {
-        //
+        $company = Company::find($id, ['id', 'name']);
+
+        return response()->json($company);
     }
 
     /**
@@ -62,14 +57,27 @@ class CompanyController extends Controller
      */
     public function update(Request $request, Company $company)
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:companies,name,' . $request->id
+        ],[
+            'name.required' => 'El campo es obligatorio',
+            'name.unique' => 'El nombre debe ser unico',
+        ]);
+
+        $company = Company::find($request->id)->update([
+            'name' => $request->name
+        ]);
+
+        return response()->json($company);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Company $company)
+    public function destroy($id)
     {
-        //
+        $company = Company::find($id)->delete();
+
+        return response()->json($company);
     }
 }

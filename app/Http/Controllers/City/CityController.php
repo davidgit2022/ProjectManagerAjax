@@ -52,7 +52,7 @@ class CityController extends Controller
         return response()->json($city);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $request->validate([
             'name' => 'required|unique:cities,name,' . $request->id,

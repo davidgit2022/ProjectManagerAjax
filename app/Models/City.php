@@ -14,4 +14,10 @@ class City extends Model
     public function projects(){
         return $this->hasMany(Project::class);
     }
+
+    public function getFormatNameAttribute()
+    {
+        $name = $this->attributes['name'];
+        return ucfirst($name);     
+    }
 }

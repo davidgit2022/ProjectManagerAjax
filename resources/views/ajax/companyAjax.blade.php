@@ -1,125 +1,121 @@
 <script type="text/javascript">
     $(document).ready(function() {
-
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
 
-        $('#table-cities').DataTable({
+        $('#table-company').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('cities.index') }}",
+            ajax: "{{ route('companies.index') }}",
             columns: [{
                     data: 'id',
                     name: 'id'
                 },
                 {
                     data: 'name',
-                    name: 'name'
+                    dame: 'name'
                 },
-
                 {
                     data: 'action',
                     name: 'action',
                     orderable: false
-                },
+
+                }
             ],
             order: [
                 [0, 'desc']
             ]
         });
 
-        /* Show Modal New City */
-        $('.float-sm-end .btn-success').on('click', (event) => {
+        /* Show Modal New Company */
+        $('.float-sm-end .btn-success').on('click', function(event) {
             $('#theModal').modal('show');
-            $('#titleModal').html('CREAR CIUDAD')
+            $('#titleModal').html('CREAR COMPAÑIA');
             $('#btnSave').show();
             $('#btnUpdate').hide();
         });
 
-        /* Close modal */
+        /* Create Company */
+        $('#btnSave').on('click', (event) => {
+            let formData = new FormData($('#companyForm')[0]);
+
+            $.ajax({
+                type: "POST",
+                url: "{{ route('companies.store') }}",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    cancel();
+                    let tableCompany = $('#table-company').DataTable();
+                    tableCompany.ajax.reload();
+                    toastr.clear(),
+                    toastr.success('Compañia creada existosamente.')
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        showErrors(errors);
+                    }
+                }
+            });
+        });
+
+        /* Update Company */
+        $('#btnUpdate').on('click', (event) => {
+            let formData = new FormData($('#companyForm')[0]);
+            let id = $('#id').val();
+            $.ajax({
+                type: "POST",
+                url: "companies/update/" + id,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    cancel();
+                    let tableCompany = $('#table-company').DataTable();
+                    tableCompany.ajax.reload();
+                    toastr.clear(),
+                        toastr.success('Compañia actualizada existosamente.')
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        showErrors(errors);
+                    }
+                }
+            })
+        })
+
+        /* Close Modal */
         $('.btnClose').on('click', (event) => {
             cancel()
         });
 
-        /* Save City */
-        $('#btnSave').on('click', (event) => {
-            let formData = new FormData($('#cityForm')[0]);
-            $.ajax({
-                type: 'POST',
-                url: "{{ route('cities.store') }}",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function(data) {
-                    cancel();
-                    let tableCity = $('#table-cities').DataTable();
-                    tableCity.ajax.reload();
-                    toastr.clear,
-                    toastr.success('Ciudad creado existosamente.')
-                    $('.btnSave').attr("disabled", true);
-                },
-                error: function(xhr) {
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        showErrors(errors);
-                    }
-                }
-            })
-        });
-
-        /* Update city */
-        $('#btnUpdate').on('click', (event) => {
-            let formData = new FormData($('#cityForm')[0]);
-            let id = $('#id').val();
-            $.ajax({
-                type: "POST",
-                url: "cities/update/" + id,
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function(data) {
-                    cancel();
-                    let tableCity = $('#table-cities').DataTable();
-                    tableCity.ajax.reload();
-                    toastr.clear,
-                    toastr.success('Ciudad actualizada existosamente.')
-                },
-                error: function(xhr) {
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        showErrors(errors);
-                    }
-                }
-            })
-        })
-
-
     });
 
-    /* function edit  */
     function editFun(id) {
         $.ajax({
             type: "GET",
-            url: "cities/edit/" + id,
+            url: "companies/edit/" + id,
             dataType: "json",
             success: function(res) {
                 $('#theModal').modal('show');
                 $('#id').val(res.id);
-                $('#name').val(res.name)
-                $('#titleModal').html('EDITAR CIUDAD ')
-                $('#btnUpdate').show();
+                $('#name').val(res.name);
+                $('#titleModal').html('EDITAR COMPAÑIA');
                 $('#btnSave').hide();
-                
+                $('#btnUpdate').show();
             }
         })
+
     };
 
-    /* function delete */
     function deleteFunc(id) {
         Swal.fire({
             title: 'Esta seguro?',
@@ -134,41 +130,38 @@
             if (result.isConfirmed) {
                 $.ajax({
                     type: "DELETE",
-                    url: "cities/delete/" + id,
+                    url: "companies/delete/" + id,
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     dataType: "json",
                     success: function(res) {
                         toastr.clear,
-                        toastr.success('Ciudad eliminada existosamente.')
-                        let tableCity = $('#table-cities').DataTable();
-                        tableCity.ajax.reload();
+                        toastr.success('Compañia eliminada existosamente.')
+                        let tableCompany = $('#table-company').DataTable();
+                        tableCompany.ajax.reload();
                     }
                 })
 
             }
         })
-    };
+    }
 
-    /* function cancel */
     function cancel() {
         $('#theModal').modal('hide');
-        resetInputFields();
+        resetInputFields()
     };
 
-    /* function clearFields */
     function resetInputFields() {
-        $('#cityForm')[0].reset();
-        $('.error-message').hide();
+        $('#companyForm')[0].reset();
+        $('.error-message').hide()
     };
 
-    /* function show Errors */
     function showErrors(errors) {
         for (const error in errors) {
             let errorSpan = $('#' + error + 'Error');
             errorSpan.text(errors[error][0]);
             errorSpan.show();
         }
-    };
+    }
 </script>

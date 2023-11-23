@@ -5,15 +5,26 @@ namespace App\Http\Controllers\Project;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class ProjectController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public $pageName = 'LISTADO';
+    PUBLIC $componentName = 'PROYECTOS';
+
     public function index()
     {
-        //
+        if (request()->ajax()) {
+            return datatables()->of(Project::select('*'))
+                ->addColumn('action', 'common.button-action')
+                ->rawColumns(['action'])
+                ->addIndexColumn()
+                ->make(true);
+        }
+        return view('project.index',[
+            'pageName' => $this->pageName,
+            'componentName' => $this->componentName
+        ]);
     }
 
     /**
